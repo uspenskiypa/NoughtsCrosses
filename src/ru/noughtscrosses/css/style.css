@@ -1,0 +1,10 @@
+.centre-grid {
+    -fx-background-color: lightcyan ;
+    -fx-border-color: pink ;
+    -fx-border-width: 5;
+}
+.side-panels {
+    -fx-background-color: lightcyan ;
+    -fx-border-color: pink ;
+    -fx-border-width: 5;
+}

@@ -8,8 +8,82 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="200" prefWidth="320" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.noughtscrosses.controller.MainController">
-    <children>
-
-    </children>
-</AnchorPane>
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0" prefWidth="850.0" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.noughtscrosses.controller.MainController">
+   <children>
+      <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="500.0" prefWidth="850.0">
+         <children>
+            <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="500.0" prefWidth="150.0">
+               <children>
+                  <Pane fx:id="pnRoleLeft" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="150.0" prefWidth="150.0" styleClass="side-panels" />
+                  <Pane fx:id="pnCross" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="150.0" prefWidth="150.0" styleClass="side-panels" />
+               </children>
+               <HBox.margin>
+                  <Insets left="25.0" />
+               </HBox.margin>
+            </VBox>
+            <GridPane fx:id="pnGridBox" alignment="CENTER" gridLinesVisible="true" maxHeight="-Infinity" maxWidth="-Infinity" onMouseReleased="#pnGridBoxMouseReleasedAction" prefHeight="450.0" prefWidth="450.0" styleClass="centre-grid">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <HBox.margin>
+                  <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+               </HBox.margin>
+               <children>
+                  <Pane prefHeight="200.0" prefWidth="200.0" />
+                  <Pane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" />
+                  <Pane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" />
+                  <Pane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" />
+                  <Pane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Pane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                  <Pane prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2" />
+                  <Pane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Pane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+               </children>
+            </GridPane>
+            <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="500.0" prefWidth="150.0">
+               <children>
+                  <Pane fx:id="pnRoleRight" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="150.0" prefWidth="150.0" styleClass="side-panels" />
+                  <Pane fx:id="pnNought" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="150.0" prefWidth="150.0" styleClass="side-panels" />
+               </children>
+               <HBox.margin>
+                  <Insets right="25.0" />
+               </HBox.margin>
+            </VBox>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="200.0" prefWidth="850.0">
+         <children>
+            <TitledPane animated="false" text="Сложность">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <content>
+                  <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="200.0" prefWidth="200.0" />
+               </content>
+            </TitledPane>
+            <Button fx:id="btStart" mnemonicParsing="false" onAction="#btStartButtonAction" text="Начать игру">
+               <font>
+                  <Font size="24.0" />
+               </font>
+               <HBox.margin>
+                  <Insets bottom="75.0" left="100.0" right="100.0" />
+               </HBox.margin>
+            </Button>
+            <TitledPane animated="false" text="Пауза">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <content>
+                  <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="200.0" prefWidth="200.0" />
+               </content>
+            </TitledPane>
+         </children></HBox>
+   </children>
+</VBox>
