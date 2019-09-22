@@ -1,10 +1,9 @@
 .centre-grid {
-    -fx-background-color: lightcyan ;
+    -fx-background-color: white ;
     -fx-border-color: pink ;
-    -fx-border-width: 5;
+    -fx-border-width: 5 ;
 }
 .side-panels {
-    -fx-background-color: lightcyan ;
-    -fx-border-color: pink ;
-    -fx-border-width: 5;
+    -fx-background-color: pink, white ;
+    -fx-background-insets: 0, 5 ;
 }
