@@ -11,7 +11,8 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/ru/noughtscrosses/fxml/main.fxml"));
-        Scene scene = new Scene(root, 1000, 700);
+        Scene scene = new Scene(root, 850, 700);
+        scene.getStylesheets().add("/ru/noughtscrosses/css/style.css");
         
         stage.setTitle("Крестики-нолики");
         stage.setResizable(false);
