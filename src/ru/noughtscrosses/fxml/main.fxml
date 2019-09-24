@@ -14,8 +14,8 @@
          <children>
             <VBox alignment="CENTER" prefHeight="500.0" prefWidth="150.0">
                <children>
-                  <StackPane fx:id="pnRoleLeft" prefHeight="150.0" prefWidth="150.0" styleClass="side-panels" />
-                  <Pane fx:id="pnCross" prefHeight="150.0" prefWidth="150.0" styleClass="side-panels" />
+                  <StackPane fx:id="pnRoleLeft" onMouseClicked="#pnRoleLeftMouseClickedAction" prefHeight="150.0" prefWidth="150.0" styleClass="side-panels" />
+                  <Pane fx:id="pnCross" onMouseClicked="#pnCrossMouseClickedAction" prefHeight="150.0" prefWidth="150.0" styleClass="side-panels" />
                </children>
                <HBox.margin>
                   <Insets left="25.0" />
@@ -38,8 +38,8 @@
             </GridPane>
             <VBox alignment="CENTER" prefHeight="500.0" prefWidth="150.0">
                <children>
-                  <StackPane fx:id="pnRoleRight" prefHeight="150.0" prefWidth="150.0" styleClass="side-panels" />
-                  <Pane fx:id="pnNought" prefHeight="150.0" prefWidth="150.0" styleClass="side-panels" />
+                  <StackPane fx:id="pnRoleRight" onMouseClicked="#pnRoleRightMouseClickedAction" prefHeight="150.0" prefWidth="150.0" styleClass="side-panels" />
+                  <Pane fx:id="pnNought" onMouseClicked="#pnNoughtMouseClickedAction" prefHeight="150.0" prefWidth="150.0" styleClass="side-panels" />
                </children>
                <HBox.margin>
                   <Insets right="25.0" />

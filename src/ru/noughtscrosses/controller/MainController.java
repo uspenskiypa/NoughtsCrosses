@@ -1,5 +1,6 @@
 package ru.noughtscrosses.controller;
 
+import com.sun.javafx.scene.control.skin.CustomColorDialog;
 import java.util.Random;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -7,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -16,6 +18,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polyline;
 import javafx.scene.shape.Shape;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
 public class MainController {
 
@@ -38,17 +42,27 @@ public class MainController {
     private Pane pnNought; //Панель с "ноликом"
 
     int strokeCount;  //счетчик ходов
+    Random rn = new Random();
     Color drawPenLeft = Color.CORAL;
     Color drawPenRight = Color.AQUAMARINE;
     Shape[] arr; //массив фигур
+    boolean isRoleLeftComputer = false;
+    boolean isRoleRightComputer = true;
+    Image imageComputer;
+    ImageView imageViewLeft;
+    Image imagePerson;
+    ImageView imageViewRight;
+    Polyline polyline;
+    Circle circle;
+    final ColorPicker colorPicker = new ColorPicker();
 
     //Метод для инициализации объектов
     @FXML
     private void initialize() {
-        Polyline polyline = new Polyline(
+        polyline = new Polyline(
             new double[] {20, 20, 130, 130, 75, 75, 20, 130, 130, 20}
         );
-        Circle circle = new Circle(75, 75, 55);
+        circle = new Circle(75, 75, 55);
         circle.setStrokeWidth(10);
         circle.setStroke(drawPenRight);
         circle.setFill(Color.WHITE);
@@ -56,10 +70,53 @@ public class MainController {
         polyline.setStroke(drawPenLeft);
         pnCross.getChildren().add(polyline);
         pnNought.getChildren().add(circle);
-        ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/ru/noughtscrosses/icons/computer.jpg")));
-        pnRoleRight.getChildren().add(imageView);
-        ImageView imageView2 = new ImageView(new Image(getClass().getResourceAsStream("/ru/noughtscrosses/icons/person.jpg")));
-        pnRoleLeft.getChildren().add(imageView2);
+        imageComputer = new Image(getClass().getResourceAsStream("/ru/noughtscrosses/icons/computer.jpg"));
+        imagePerson = new Image(getClass().getResourceAsStream("/ru/noughtscrosses/icons/person.jpg"));
+        imageViewLeft = new ImageView(imagePerson);
+        imageViewRight = new ImageView(imageComputer);
+        pnRoleRight.getChildren().add(imageViewRight);
+        pnRoleLeft.getChildren().add(imageViewLeft);
+        
+    }
+    
+    //Обработчик нажатия на левую панель с ролью
+    public void pnRoleLeftMouseClickedAction(MouseEvent mouseEvent) {
+        pnRoleLeft.getChildren().clear();
+        if (isRoleLeftComputer) {
+            isRoleLeftComputer = false;
+            imageViewLeft = new ImageView(imagePerson);
+        }
+        else {
+            isRoleLeftComputer = true;
+            imageViewLeft = new ImageView(imageComputer);
+        }
+        pnRoleLeft.getChildren().add(imageViewLeft);
+    }
+    
+    //Обработчик нажатия на правую панель с ролью
+    public void pnRoleRightMouseClickedAction(MouseEvent mouseEvent) {
+        pnRoleRight.getChildren().clear();
+        if (isRoleRightComputer) {
+            isRoleRightComputer = false;
+            imageViewRight = new ImageView(imagePerson);
+        }
+        else {
+            isRoleRightComputer = true;
+            imageViewRight = new ImageView(imageComputer);
+        }
+        pnRoleRight.getChildren().add(imageViewRight);
+    }
+    
+    //Обработчик нажатия на левую панель с крестиком
+    public void pnCrossMouseClickedAction(MouseEvent mouseEvent) {
+        drawPenLeft = Color.rgb(rn.nextInt(256), rn.nextInt(256), rn.nextInt(256));
+        polyline.setStroke(drawPenLeft);
+    }
+    
+    //Обработчик нажатия на правую панель с ноликом
+    public void pnNoughtMouseClickedAction(MouseEvent mouseEvent) {
+        drawPenRight = Color.rgb(rn.nextInt(256), rn.nextInt(256), rn.nextInt(256));
+        circle.setStroke(drawPenRight);
     }
 
     //Обработчик нажатия на кнопку "Начать игру"
@@ -106,7 +163,6 @@ public class MainController {
                 else {
                     target.getChildren().add(arr[strokeCount]);
                 }
-                //System.out.println(strokeCount);
                 ++strokeCount;
             }
         } 
