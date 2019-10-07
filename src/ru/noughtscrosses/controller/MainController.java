@@ -1,10 +1,15 @@
 package ru.noughtscrosses.controller;
 
 import java.util.Random;
+import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -14,6 +19,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polyline;
 import javafx.scene.shape.Shape;
+import javafx.scene.text.Font;
+import javafx.util.Duration;
 import ru.noughtscrosses.objects.Board;
 import ru.noughtscrosses.objects.Cell;
 import ru.noughtscrosses.objects.State;
@@ -22,22 +29,28 @@ import ru.noughtscrosses.objects.Turn;
 public class MainController {
 
     @FXML
-    public GridPane pnGridBox; //Панель с игровым полем
+    public GridPane pnGridBox; //панель с игровым полем
 
     @FXML
     private Button btStart; //кнопка "Начать игру"
 
     @FXML
-    private Pane pnRoleLeft; //Левая панель с выбором роли
+    private Pane pnRoleLeft; //левая панель с выбором роли
 
     @FXML
-    private Pane pnRoleRight; //Правая панель с выбором роли
+    private Pane pnRoleRight; //правая панель с выбором роли
 
     @FXML
-    private Pane pnCross; //Панель с "крестиком"
+    private Pane pnCross; //панель с "крестиком"
 
     @FXML
-    private Pane pnNought; //Панель с "ноликом"
+    private Pane pnNought; //панель с "ноликом"
+    
+    @FXML
+    private Label lbGameResult; //значок с результатом игры
+    
+    @FXML
+    private Slider sliderPause; //слайдер задержки хода ИИ
 
     int strokeCount;  //счетчик ходов
     Random rn = new Random();
@@ -54,6 +67,7 @@ public class MainController {
     Circle circle;
     Board board;
     Turn turn;
+    Timeline timeline;
 
     //Метод для инициализации объектов
     @FXML
@@ -124,6 +138,7 @@ public class MainController {
         board = new Board(columns, rows);
         pnGridBox.setDisable(false);
         pnGridBox.getChildren().clear();
+        lbGameResult.setText("");
         for (int i = 0; i < columns; i++) {
             for (int j = 0; j < rows; j++) {
                 Pane pane = new Pane();
@@ -148,52 +163,41 @@ public class MainController {
                 arr[i] = p;
             }
         }
-        
-//        board.getCellField()[2][1].state = State.CROSS;
-//        ((Pane) getNodeFromGridPane(pnGridBox, 2, 1)).getChildren().add(arr[strokeCount]);
-//        ++strokeCount;
-//
-//        board.getCellField()[0][0].state = State.NOUGHT;
-//        ((Pane) getNodeFromGridPane(pnGridBox, 0, 0)).getChildren().add(arr[strokeCount]);
-//        ++strokeCount;
-//
-//        board.getCellField()[0][2].state = State.CROSS;
-//        ((Pane) getNodeFromGridPane(pnGridBox, 0, 2)).getChildren().add(arr[strokeCount]);
-//        ++strokeCount;
-//
-//        board.getCellField()[1][1].state = State.NOUGHT;
-//        ((Pane) getNodeFromGridPane(pnGridBox, 1, 1)).getChildren().add(arr[strokeCount]);
-//        ++strokeCount;
-//
-//        board.getCellField()[1][0].state = State.CROSS;
-//        ((Pane) getNodeFromGridPane(pnGridBox, 1, 0)).getChildren().add(arr[strokeCount]);
-//        ++strokeCount;
-//
-//        board.getCellField()[0][1].state = State.NOUGHT;
-//        ((Pane) getNodeFromGridPane(pnGridBox, 0, 1)).getChildren().add(arr[strokeCount]);
-//        ++strokeCount;
-
         if (isRoleLeftComputer) {
             Cell firstCell = board.moveFirst();
             firstCell.state = State.CROSS;
             ((Pane)getNodeFromGridPane(pnGridBox, firstCell.x, firstCell.y)).getChildren().add(arr[strokeCount]);
             ++strokeCount;
             if (isRoleRightComputer) {
-                while (strokeCount < 9) {
-                    if ((strokeCount & 1) == 1) {
-                        Cell bestCell = board.getBestCell(Turn.OURTURN, State.NOUGHT, 5);
-                        bestCell.state = State.NOUGHT;
-                        ((Pane) getNodeFromGridPane(pnGridBox, bestCell.x, bestCell.y)).getChildren().add(arr[strokeCount]);
-                    } 
-                    else {
-                        Cell bestCell = board.getBestCell(Turn.OURTURN, State.CROSS, 5);
-                        bestCell.state = State.CROSS;
-                        ((Pane) getNodeFromGridPane(pnGridBox, bestCell.x, bestCell.y)).getChildren().add(arr[strokeCount]);
-                    }
-                    ++strokeCount;
-                }
+                timeline = new Timeline();
+                timeline.setCycleCount(8);
+                timeline.getKeyFrames().add(getNewKeyFrame());
+                btStart.setDisable(true);
+                pnGridBox.setDisable(true);
+                timeline.play();
             }
         }
+    }
+    
+    private KeyFrame getNewKeyFrame() {
+        KeyFrame keyFrame = new KeyFrame(Duration.seconds(sliderPause.getValue()), (ActionEvent evt) -> {
+            if ((strokeCount & 1) == 1) {
+                Cell bestCell = board.getBestCell(Turn.OURTURN, State.NOUGHT, 5);
+                bestCell.state = State.NOUGHT;
+                ((Pane) getNodeFromGridPane(pnGridBox, bestCell.x, bestCell.y)).getChildren().add(arr[strokeCount]);
+            } else {
+                Cell bestCell = board.getBestCell(Turn.OURTURN, State.CROSS, 5);
+                bestCell.state = State.CROSS;
+                ((Pane) getNodeFromGridPane(pnGridBox, bestCell.x, bestCell.y)).getChildren().add(arr[strokeCount]);
+            }
+            if (isEndGame()) {
+                pnGridBox.setDisable(false);
+                btStart.setDisable(false);
+                timeline.stop();
+            }
+            ++strokeCount;
+        });
+        return keyFrame;
     }
 
     //Обработчик нажатия на панель с игровым полем
@@ -224,10 +228,10 @@ public class MainController {
                         bestCell.state = State.CROSS;
                         ((Pane) getNodeFromGridPane(pnGridBox, bestCell.x, bestCell.y)).getChildren().add(arr[strokeCount]);
                     }
-                    ++strokeCount;
                     if (isEndGame()) {
                         pnGridBox.setDisable(true);
                     }
+                    ++strokeCount;
                 }
             }
         } 
@@ -253,15 +257,18 @@ public class MainController {
     //Возвращает объект панели по индексу
     private boolean isEndGame() {
         if (board.isSomeoneWon(board.getCellField(), State.CROSS)) {
-            System.out.println("ПОБЕДИЛИ КРЕСТИКИ!");
+            lbGameResult.setTextFill(drawPenLeft);
+            lbGameResult.setText("Победили крестики!");
             return true;
         } 
         else if (board.isSomeoneWon(board.getCellField(), State.NOUGHT)) {
-            System.out.println("ПОБЕДИЛИ НОЛИКИ!");
+            lbGameResult.setTextFill(drawPenRight);
+            lbGameResult.setText("Победили нолики!");
             return true;
         } 
         else if (board.isEndOfMoves(board.getCellField())) {
-            System.out.println("НИЧЬЯ!");
+            lbGameResult.setTextFill(Color.BLACK);
+            lbGameResult.setText("Ничья!");
             return true;
         }
         return false;

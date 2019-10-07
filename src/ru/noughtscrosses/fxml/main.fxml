@@ -49,29 +49,75 @@
       </HBox>
       <HBox alignment="CENTER" prefHeight="200.0" prefWidth="850.0">
          <children>
-            <TitledPane animated="false" text="Сложность">
+            <TitledPane animated="false" collapsible="false" text="Сложность">
                <font>
                   <Font size="14.0" />
                </font>
                <content>
-                  <VBox prefHeight="200.0" prefWidth="200.0" />
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0">
+                     <children>
+                        <RadioButton mnemonicParsing="false" selected="true" text="Максимальная">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="15.0" right="20.0" />
+                           </VBox.margin>
+                           <toggleGroup>
+                              <ToggleGroup fx:id="tgComplexity" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton mnemonicParsing="false" text="Облегченная" toggleGroup="$tgComplexity">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets right="30.0" top="10.0" />
+                           </VBox.margin>
+                        </RadioButton>
+                     </children></VBox>
                </content>
-            </TitledPane>
-            <Button fx:id="btStart" mnemonicParsing="false" onAction="#btStartButtonAction" text="Начать игру">
-               <font>
-                  <Font size="24.0" />
-               </font>
                <HBox.margin>
-                  <Insets bottom="75.0" left="100.0" right="100.0" />
+                  <Insets bottom="50.0" />
                </HBox.margin>
-            </Button>
-            <TitledPane animated="false" text="Пауза">
+            </TitledPane>
+            <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="200.0" prefWidth="300.0">
+               <children>
+                  <StackPane prefHeight="150.0" prefWidth="200.0">
+                     <children>
+                        <Label fx:id="lbGameResult">
+                           <font>
+                              <Font size="25.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </StackPane>
+                  <Button fx:id="btStart" mnemonicParsing="false" onAction="#btStartButtonAction" text="Начать игру">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets top="30.0" />
+                     </VBox.margin>
+                  </Button>
+               </children>
+               <HBox.margin>
+                  <Insets bottom="50.0" />
+               </HBox.margin>
+            </VBox>
+            <TitledPane animated="false" collapsible="false" text="Задержка хода ИИ">
                <font>
                   <Font size="14.0" />
                </font>
                <content>
-                  <VBox prefHeight="200.0" prefWidth="200.0" />
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0">
+                     <children>
+                        <Slider fx:id="sliderPause" blockIncrement="0.1" majorTickUnit="0.25" max="1.0" min="1.0E-4" minorTickCount="0" showTickLabels="true" showTickMarks="true" />
+                     </children></VBox>
                </content>
+               <HBox.margin>
+                  <Insets bottom="50.0" />
+               </HBox.margin>
             </TitledPane>
          </children></HBox>
    </children>
