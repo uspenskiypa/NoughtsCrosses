@@ -1,12 +1,14 @@
 package ru.noughtscrosses.objects;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 public class Board {
 
     private Cell[][] cellField; //двумерный массив ячеек
-    private int width, height; //ширина и высота поля
-    private Random rn = new Random();
+    private final int width, height; //ширина и высота поля
+    private final Random rn = new Random();
 
     //Конструктор класса Board
     //Принимает размер игрового поля
@@ -120,14 +122,31 @@ public class Board {
     //Возвращает ячейку с наивысшим значение
     public Cell getBestCell(Turn turn, State state, int depth) {
         valuation(cellField, null, turn, state, depth);
-        Cell bestCell = null;
+        //Cell bestCell = null;
         int maxValue = Integer.MIN_VALUE;
+        ArrayList<Cell> listBestCell = new ArrayList<>();
         for (Cell[] cells : cellField) {
             for (Cell cell : cells) {
-                if (cell.value > maxValue && cell.state == State.EMPTY) {
-                    maxValue = cell.value;
-                    bestCell = cell;
+                System.out.println("[" + cell.x + "][" + cell.y + "] = " + cell.value);
+                if (cell.state == State.EMPTY) {
+                    if (cell.value > maxValue) {
+                        maxValue = cell.value;
+                        listBestCell.clear();
+                        listBestCell.add(cell);
+                    } 
+                    else if (cell.value == maxValue) {
+                        listBestCell.add(cell);
+                    }
                 }
+            }
+        }
+        Collections.shuffle(listBestCell);
+        Cell bestCell = listBestCell.get(0);
+        System.out.println("==========================");
+        //Обнуляем ценность ячеек перед следующим ходом
+        for (Cell[] cells : cellField) {
+            for (Cell cell : cells) {
+                cell.value = 0;
             }
         }
         return bestCell;
@@ -148,29 +167,29 @@ public class Board {
                             newBoard[k][l] = new Cell(board[k][l]);
                         }
                     }
-                    Cell choosenCell = cell;
                     newBoard[i][j].state = state;
                     if (depth == 5) {
-                        choosenCell = cellField[i][j];
+                        cell = cellField[i][j];
+                        smartChangeValue(newBoard, cell, state);
                     }
                     if (isGameOver(newBoard, depth)) {
                         int bestValue = calcBestValue(newBoard, turn, state);
                         if (turn == Turn.OURTURN) {
+                            cell.value += bestValue*depth*depth*depth;
                             if (depth == 5) {
-                                choosenCell.value += bestValue*1000;
+                                cell.value += bestValue*50;
+                                return 0;
                             }
-                            choosenCell.value += bestValue*depth*depth*depth;
                         }
                         else {
+                            cell.value += bestValue*depth*depth*depth;
                             if (depth == 4) {
-                                choosenCell.value += bestValue*1000;
+                                cell.value += bestValue*50;
                             }
-                            choosenCell.value += bestValue*depth*depth;
                         }
-                        return 0;
                     } 
                     else {
-                        valuation(newBoard, choosenCell, getNewTurn(turn), getNewState(state), depth - 1);
+                        valuation(newBoard, cell, getNewTurn(turn), getNewState(state), depth - 1);
                     }
                 }
             }
@@ -186,5 +205,30 @@ public class Board {
     //Возвращает новую очередность хода Turn
     public Turn getNewTurn(Turn turn) {
         return turn == Turn.OURTURN ? Turn.ENEMYTURN : Turn.OURTURN;
+    }
+    
+    //
+    public void smartChangeValue(Cell[][] board, Cell cell, State state) {
+        State otherState = getNewState(state);
+        if (board[1][1].state == state) {
+            if ((board[0][0].state == otherState && board[2][2].state == otherState) 
+                    || (board[0][2].state == otherState && board[2][0].state == otherState)) {
+                int colEmpty = 0;
+                for (Cell[] cells : board) {
+                    for (Cell c : cells) {
+                        if (c.state == State.EMPTY) {
+                            ++colEmpty;
+                        }
+                    }
+                }
+                System.out.println(colEmpty);
+                if (colEmpty == 5) {
+                    int sum = cell.x + cell.y;
+                    if (sum == 1 || sum == 3) {
+                        cell.value += 1000;
+                    }
+                }
+            }
+        }
     }
 }
