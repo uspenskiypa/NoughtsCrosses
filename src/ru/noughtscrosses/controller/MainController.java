@@ -1,6 +1,7 @@
 package ru.noughtscrosses.controller;
 
 import java.util.Random;
+import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
@@ -19,12 +20,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polyline;
 import javafx.scene.shape.Shape;
-import javafx.scene.text.Font;
 import javafx.util.Duration;
 import ru.noughtscrosses.objects.Board;
 import ru.noughtscrosses.objects.Cell;
 import ru.noughtscrosses.objects.State;
-import ru.noughtscrosses.objects.Turn;
 
 public class MainController {
 
@@ -52,22 +51,21 @@ public class MainController {
     @FXML
     private Slider sliderPause; //слайдер задержки хода ИИ
 
-    int strokeCount;  //счетчик ходов
-    Random rn = new Random();
-    Color drawPenLeft = Color.CORAL;
-    Color drawPenRight = Color.AQUAMARINE;
-    Shape[] arr; //массив фигур
-    boolean isRoleLeftComputer = false;
-    boolean isRoleRightComputer = true;
-    Image imageComputer;
-    ImageView imageViewLeft;
-    Image imagePerson;
-    ImageView imageViewRight;
-    Polyline polyline;
-    Circle circle;
-    Board board;
-    Turn turn;
-    Timeline timeline;
+    private int strokeCount;  //счетчик ходов
+    private Random rn = new Random();
+    private Color drawPenLeft = Color.CORAL;
+    private Color drawPenRight = Color.AQUAMARINE;
+    private Shape[] arr; //массив фигур
+    private boolean isRoleLeftComputer = false;
+    private boolean isRoleRightComputer = true;
+    private Image imageComputer;
+    private ImageView imageViewLeft;
+    private Image imagePerson;
+    private ImageView imageViewRight;
+    private Polyline polyline;
+    private Circle circle;
+    private Board board;
+    private Timeline timeline;
 
     //Метод для инициализации объектов
     @FXML
@@ -96,7 +94,8 @@ public class MainController {
         if (isRoleLeftComputer) {
             isRoleLeftComputer = false;
             imageViewLeft = new ImageView(imagePerson);
-        } else {
+        } 
+        else {
             isRoleLeftComputer = true;
             imageViewLeft = new ImageView(imageComputer);
         }
@@ -109,7 +108,8 @@ public class MainController {
         if (isRoleRightComputer) {
             isRoleRightComputer = false;
             imageViewRight = new ImageView(imagePerson);
-        } else {
+        } 
+        else {
             isRoleRightComputer = true;
             imageViewRight = new ImageView(imageComputer);
         }
@@ -137,6 +137,8 @@ public class MainController {
         arr = new Shape[9];
         board = new Board(columns, rows);
         pnGridBox.setDisable(false);
+        pnRoleLeft.setDisable(true);
+        pnRoleRight.setDisable(true);
         pnGridBox.getChildren().clear();
         lbGameResult.setText("");
         for (int i = 0; i < columns; i++) {
@@ -152,6 +154,7 @@ public class MainController {
                 circ.setStrokeWidth(10);
                 circ.setStroke(drawPenRight);
                 circ.setFill(Color.WHITE);
+                circ.setOpacity(0.1);
                 arr[i] = circ;
             } 
             else {
@@ -160,6 +163,7 @@ public class MainController {
                 );
                 p.setStrokeWidth(10);
                 p.setStroke(drawPenLeft);
+                p.setOpacity(0.1);
                 arr[i] = p;
             }
         }
@@ -167,6 +171,9 @@ public class MainController {
             Cell firstCell = board.moveFirst();
             firstCell.state = State.CROSS;
             ((Pane)getNodeFromGridPane(pnGridBox, firstCell.x, firstCell.y)).getChildren().add(arr[strokeCount]);
+            FadeTransition ft = new FadeTransition(Duration.seconds(sliderPause.getValue()/2), arr[strokeCount]);
+            ft.setToValue(1);
+            ft.play();
             ++strokeCount;
             if (isRoleRightComputer) {
                 timeline = new Timeline();
@@ -181,18 +188,18 @@ public class MainController {
     
     private KeyFrame getNewKeyFrame() {
         KeyFrame keyFrame = new KeyFrame(Duration.seconds(sliderPause.getValue()), (ActionEvent evt) -> {
-            if ((strokeCount & 1) == 1) {
-                Cell bestCell = board.getBestCell(Turn.OURTURN, State.NOUGHT, 5);
-                bestCell.state = State.NOUGHT;
-                ((Pane) getNodeFromGridPane(pnGridBox, bestCell.x, bestCell.y)).getChildren().add(arr[strokeCount]);
-            } else {
-                Cell bestCell = board.getBestCell(Turn.OURTURN, State.CROSS, 5);
-                bestCell.state = State.CROSS;
-                ((Pane) getNodeFromGridPane(pnGridBox, bestCell.x, bestCell.y)).getChildren().add(arr[strokeCount]);
-            }
+            State state = ((strokeCount & 1) == 1) ? State.NOUGHT : State.CROSS;
+            Cell bestCell = board.getBestCell(state, 5);
+            bestCell.state = state;
+            ((Pane) getNodeFromGridPane(pnGridBox, bestCell.x, bestCell.y)).getChildren().add(arr[strokeCount]);
+            FadeTransition ft = new FadeTransition(Duration.seconds(sliderPause.getValue()/2), arr[strokeCount]);
+            ft.setToValue(1);
+            ft.play();
             if (isEndGame()) {
-                pnGridBox.setDisable(false);
+                pnGridBox.setDisable(true);
                 btStart.setDisable(false);
+                pnRoleLeft.setDisable(false);
+                pnRoleRight.setDisable(false);
                 timeline.stop();
             }
             ++strokeCount;
@@ -205,33 +212,39 @@ public class MainController {
         try {
             Pane target = (Pane) mouseEvent.getTarget();
             if (target.getWidth() <= 150 && target.getChildren().isEmpty()) {
-                if ((strokeCount & 1) == 1) {
-                    target.getChildren().add(arr[strokeCount]);
-                    getCellFromGridPane(target).state = State.NOUGHT;
-                } 
-                else {
-                    target.getChildren().add(arr[strokeCount]);
-                    getCellFromGridPane(target).state = State.CROSS;
-                }
+                target.getChildren().add(arr[strokeCount]);
+                FadeTransition ftn = new FadeTransition(Duration.seconds(sliderPause.getValue()/2), arr[strokeCount]);
+                ftn.setToValue(1);
+                ftn.play();
+                getCellFromGridPane(target).state = ((strokeCount & 1) == 1) ? State.NOUGHT : State.CROSS;
                 ++strokeCount;
                 if (isEndGame()) {
                     pnGridBox.setDisable(true);
-                } 
+                    pnRoleLeft.setDisable(false);
+                    pnRoleRight.setDisable(false);
+                }
                 else if (!(!isRoleLeftComputer && !isRoleRightComputer)){
-                    if ((strokeCount & 1) == 1) {
-                        Cell bestCell = board.getBestCell(Turn.OURTURN, State.NOUGHT, 5);
-                        bestCell.state = State.NOUGHT;
+                    PauseTransition pause = new PauseTransition(Duration.seconds(sliderPause.getValue()));
+                    pause.setOnFinished((ActionEvent evt) -> {
+                        State state = ((strokeCount & 1) == 1) ? State.NOUGHT : State.CROSS;
+                        Cell bestCell = board.getBestCell(state, 5);
+                        bestCell.state = state;
                         ((Pane) getNodeFromGridPane(pnGridBox, bestCell.x, bestCell.y)).getChildren().add(arr[strokeCount]);
-                    } 
-                    else {
-                        Cell bestCell = board.getBestCell(Turn.OURTURN, State.CROSS, 5);
-                        bestCell.state = State.CROSS;
-                        ((Pane) getNodeFromGridPane(pnGridBox, bestCell.x, bestCell.y)).getChildren().add(arr[strokeCount]);
-                    }
-                    if (isEndGame()) {
-                        pnGridBox.setDisable(true);
-                    }
-                    ++strokeCount;
+                        FadeTransition ft = new FadeTransition(Duration.seconds(sliderPause.getValue()/2), arr[strokeCount]);
+                        ft.setToValue(1);
+                        ft.play();
+                        btStart.setDisable(false);
+                        pnGridBox.setDisable(false);
+                        if (isEndGame()) {
+                            pnGridBox.setDisable(true);
+                            pnRoleLeft.setDisable(false);
+                            pnRoleRight.setDisable(false);
+                        }
+                        ++strokeCount;
+                    });
+                    btStart.setDisable(true);
+                    pnGridBox.setDisable(true);
+                    pause.play();
                 }
             }
         } 

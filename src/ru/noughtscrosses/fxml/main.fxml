@@ -112,7 +112,7 @@
                <content>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0">
                      <children>
-                        <Slider fx:id="sliderPause" blockIncrement="0.1" majorTickUnit="0.25" max="1.0" min="1.0E-4" minorTickCount="0" showTickLabels="true" showTickMarks="true" />
+                        <Slider fx:id="sliderPause" blockIncrement="0.1" majorTickUnit="0.25" max="1.0" min="2.0E-4" minorTickCount="0" showTickLabels="true" showTickMarks="true" />
                      </children></VBox>
                </content>
                <HBox.margin>

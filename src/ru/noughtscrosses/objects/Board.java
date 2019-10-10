@@ -120,9 +120,8 @@ public class Board {
     }
 
     //Возвращает ячейку с наивысшим значение
-    public Cell getBestCell(Turn turn, State state, int depth) {
-        valuation(cellField, null, turn, state, depth);
-        //Cell bestCell = null;
+    public Cell getBestCell(State state, int depth) {
+        valuation(cellField, null, Turn.OURTURN, state, depth);
         int maxValue = Integer.MIN_VALUE;
         ArrayList<Cell> listBestCell = new ArrayList<>();
         for (Cell[] cells : cellField) {
@@ -207,7 +206,7 @@ public class Board {
         return turn == Turn.OURTURN ? Turn.ENEMYTURN : Turn.OURTURN;
     }
     
-    //
+    //Изменяет ценность ячеек при ситуации, когда противник занял противоположные углы
     public void smartChangeValue(Cell[][] board, Cell cell, State state) {
         State otherState = getNewState(state);
         if (board[1][1].state == state) {
@@ -221,7 +220,6 @@ public class Board {
                         }
                     }
                 }
-                System.out.println(colEmpty);
                 if (colEmpty == 5) {
                     int sum = cell.x + cell.y;
                     if (sum == 1 || sum == 3) {
