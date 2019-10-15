@@ -155,7 +155,7 @@ public class MainController {
         lbGameResult.setText("");
         maxDifficulty = rbMaxDifficulty.isSelected();
         board = new Board(columns, rows);
-        //setNodeDisable(true);
+        setNodeDisable(true);
         pnGridBox.setDisable(false);
         pnGridBox.getChildren().clear();
         fillGridPane(pnGridBox, columns, rows);
