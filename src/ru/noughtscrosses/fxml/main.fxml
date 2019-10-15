@@ -56,7 +56,7 @@
                <content>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0">
                      <children>
-                        <RadioButton mnemonicParsing="false" selected="true" text="Максимальная">
+                        <RadioButton fx:id="rbMaxDifficulty" mnemonicParsing="false" selected="true" text="Максимальная">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -64,10 +64,10 @@
                               <Insets bottom="15.0" right="20.0" />
                            </VBox.margin>
                            <toggleGroup>
-                              <ToggleGroup fx:id="tgComplexity" />
+                              <ToggleGroup fx:id="tgDifficulty" />
                            </toggleGroup>
                         </RadioButton>
-                        <RadioButton mnemonicParsing="false" text="Облегченная" toggleGroup="$tgComplexity">
+                        <RadioButton fx:id="rbLightDifficulty" mnemonicParsing="false" text="Облегченная" toggleGroup="$tgDifficulty">
                            <font>
                               <Font size="14.0" />
                            </font>

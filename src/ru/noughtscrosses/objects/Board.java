@@ -3,6 +3,7 @@ package ru.noughtscrosses.objects;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import ru.noughtscrosses.controller.MainController;
 
 public class Board {
 
@@ -25,27 +26,18 @@ public class Board {
         height = rows;
     }
 
-    //Геттер для поля cellField
+    //Геттер поля cellField
     public Cell[][] getCellField() {
         return cellField;
     }
 
-//!Временный метод! Выводит характеристики ячеек поля
-    public void printCells() {
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                System.out.print(cellField[i][j].state + " | " + cellField[i][j].x + " | " + cellField[i][j].y + " | ");
-            }
-            System.out.println();
-        }
-    }
-
-    //Выбирает ячейку для первого хода и возвращает ее индексы 
+    //Возвращает случайную ячейку игрового поля
     public Cell moveFirst() {
-        return cellField[rn.nextInt(3)][rn.nextInt(3)];
+        return cellField[rn.nextInt(height)][rn.nextInt(width)];
     }
 
-    //Проверяет поле на ниличие выиграшной комбинации. Если такая есть вернет true, иначе false.
+    //Проверяет игровое поле board на ниличие выиграшной комбинации для state
+    //Если она есть вернет true, иначе false
     public boolean isSomeoneWon(Cell[][] board, State state) {
         if ((board[0][0].state == state && board[0][1].state == state && board[0][2].state == state)
                 || (board[1][0].state == state && board[1][1].state == state && board[1][2].state == state)
@@ -62,7 +54,7 @@ public class Board {
         }
     }
 
-    //Проверяет кончились ли ходы
+    //Проверяет кончились ли ходы на игровом поле board
     public boolean isEndOfMoves(Cell[][] board) {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
@@ -74,9 +66,9 @@ public class Board {
         return true;
     }
 
-    //Проверяет матч на завершенность
-    private boolean isGameOver(Cell[][] board, int depth) {
-        if (depth == 0 || isSomeoneWon(board, State.CROSS) || isSomeoneWon(board, State.NOUGHT) || isEndOfMoves(board)) {
+    //Проверяет произошло ли завершение матча на игровом поле board
+    private boolean isGameOver(Cell[][] board) {
+        if (isSomeoneWon(board, State.CROSS) || isSomeoneWon(board, State.NOUGHT) || isEndOfMoves(board)) {
             return true;
         } 
         else {
@@ -84,7 +76,9 @@ public class Board {
         }
     }
 
-    //Подсчитывает итоговое значение для ячейки
+    //В зависимости от итоговой ситуации на игровом поле board,
+    //а также от текущего хода turn и состояния state
+    //возвращает результирующее значение
     private int calcBestValue(Cell[][] board, Turn turn, State state) {
         if (turn == Turn.OURTURN) {
             if (state == State.CROSS) {
@@ -119,14 +113,17 @@ public class Board {
         return 0;
     }
 
-    //Возвращает ячейку с наивысшим значение
+    //Возвращает ячейку с наивысшим значением для состояния state 
+    //и при глубине рекурсионного погружения depth.
+    //Подсчитывается ценность пустых ячеек игрового поля,
+    //далее ячейки с максимальной ценностью заносятся в список и
+    //возвращается случайная ячейка из этого списка.
     public Cell getBestCell(State state, int depth) {
         valuation(cellField, null, Turn.OURTURN, state, depth);
         int maxValue = Integer.MIN_VALUE;
         ArrayList<Cell> listBestCell = new ArrayList<>();
         for (Cell[] cells : cellField) {
             for (Cell cell : cells) {
-                System.out.println("[" + cell.x + "][" + cell.y + "] = " + cell.value);
                 if (cell.state == State.EMPTY) {
                     if (cell.value > maxValue) {
                         maxValue = cell.value;
@@ -141,18 +138,21 @@ public class Board {
         }
         Collections.shuffle(listBestCell);
         Cell bestCell = listBestCell.get(0);
-        System.out.println("==========================");
-        //Обнуляем ценность ячеек перед следующим ходом
-        for (Cell[] cells : cellField) {
+        for (Cell[] cells : cellField) { 
             for (Cell cell : cells) {
-                cell.value = 0;
+                cell.value = 0; //Обнуляем ценность ячеек перед следующим ходом
             }
         }
         return bestCell;
     }
 
-    //Рекурсивный обход возможных вариантов ходов игруков до заданной глубины depth
-    //и оценка значений свободных ячеек
+    /* Рекурсивный обход дерева ходов игрука до заданной глубины рекурсии
+    и расчет значений (ценности) текущих свободных ячеек.
+    board - двумерный массив ячеек
+    cell - ячейка, для которой рассчитывается ценность 
+    turn - чей ход (противника или наш)
+    state - состояние хода (ходят крестики или нолики) 
+    depth - глубина рекурсии */
     public int valuation(Cell[][] board, Cell cell, Turn turn, State state, int depth) {
         if (depth == 0) {
             return 0;
@@ -171,20 +171,15 @@ public class Board {
                         cell = cellField[i][j];
                         smartChangeValue(newBoard, cell, state);
                     }
-                    if (isGameOver(newBoard, depth)) {
+                    if (isGameOver(newBoard)) {
                         int bestValue = calcBestValue(newBoard, turn, state);
-                        if (turn == Turn.OURTURN) {
-                            cell.value += bestValue*depth*depth*depth;
-                            if (depth == 5) {
-                                cell.value += bestValue*50;
-                                return 0;
-                            }
-                        }
-                        else {
-                            cell.value += bestValue*depth*depth*depth;
-                            if (depth == 4) {
-                                cell.value += bestValue*50;
-                            }
+                        cell.value += changeBestValue(bestValue, depth);
+                        if (depth == 5) {
+                            cell.value += 600;
+                            return 0;
+                        } 
+                        else if (depth == 4) {
+                            cell.value -= 200;
                         }
                     } 
                     else {
@@ -196,23 +191,36 @@ public class Board {
         return 0;
     }
     
-    //Возвращает новое состояние State
+    //Корректирует ценнсость в зависимости от сложности, 
+    //при максимальной сложности учитывается глубина рекурсии
+    public int changeBestValue(int bestValue, int depth) {
+        if (MainController.isMaxDifficulty()) {
+            return bestValue * depth;
+        } 
+        else {
+            return bestValue;
+        }
+    }
+    
+    //Возвращает очередное состояние State
     public State getNewState(State state) {
         return state == State.CROSS ? State.NOUGHT : State.CROSS;
     }
 
-    //Возвращает новую очередность хода Turn
+    //Возвращает очередной ход Turn
     public Turn getNewTurn(Turn turn) {
         return turn == Turn.OURTURN ? Turn.ENEMYTURN : Turn.OURTURN;
     }
     
-    //Изменяет ценность ячеек при ситуации, когда противник занял противоположные углы
+    //Изменяет ценность ячейки cell при ситуации на игровом поле board, когда
+    //центр принадлежит к вашему state, а противник занял противоположные углы.
+    //Увеличивает ценность неугловых ячеек.
     public void smartChangeValue(Cell[][] board, Cell cell, State state) {
-        State otherState = getNewState(state);
+        State otherState = getNewState(state); //состояние противника
         if (board[1][1].state == state) {
             if ((board[0][0].state == otherState && board[2][2].state == otherState) 
                     || (board[0][2].state == otherState && board[2][0].state == otherState)) {
-                int colEmpty = 0;
+                int colEmpty = 0; //количество пустых ячеек
                 for (Cell[] cells : board) {
                     for (Cell c : cells) {
                         if (c.state == State.EMPTY) {
@@ -223,7 +231,10 @@ public class Board {
                 if (colEmpty == 5) {
                     int sum = cell.x + cell.y;
                     if (sum == 1 || sum == 3) {
-                        cell.value += 1000;
+                        cell.value += 60;
+                        if (MainController.isMaxDifficulty()) {
+                            cell.value += 100;
+                        }
                     }
                 }
             }
